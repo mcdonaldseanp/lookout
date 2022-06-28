@@ -11,7 +11,7 @@ import (
 	"github.com/mcdonaldseanp/lookout/sanitize"
 )
 
-func ExecReadOutput(executable string, args []string) (string, string, *rgerror.RGerror) {
+func ExecReadOutput(executable string, args []string) (string, string, error) {
 	shell_command := exec.Command(executable, args...)
 	shell_command.Env = os.Environ()
 	var stdout, stderr bytes.Buffer
@@ -30,7 +30,7 @@ func ExecReadOutput(executable string, args []string) (string, string, *rgerror.
 	return output, logs, nil
 }
 
-func ExecScriptReadOutput(executable string, script string, args []string) (string, string, *rgerror.RGerror) {
+func ExecScriptReadOutput(executable string, script string, args []string) (string, string, error) {
 	f, err := os.CreateTemp("", "lookout_script")
 	if err != nil {
 		return "", "", &rgerror.RGerror{
@@ -46,9 +46,9 @@ func ExecScriptReadOutput(executable string, script string, args []string) (stri
 	return ExecReadOutput(executable, final_args)
 }
 
-func BuildAndRunCommand(executable string, file string, script string, args []string) (string, string, *rgerror.RGerror) {
+func BuildAndRunCommand(executable string, file string, script string, args []string) (string, string, error) {
 	var output, logs string
-	var rgerr *rgerror.RGerror
+	var rgerr error
 	if len(file) > 0 {
 		final_args := append([]string{file}, args...)
 		output, logs, rgerr = ExecReadOutput(executable, final_args)

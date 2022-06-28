@@ -7,8 +7,8 @@ import (
 	"os"
 	"strings"
 
+	"github.com/mcdonaldseanp/clibuild/validator"
 	"github.com/mcdonaldseanp/lookout/rgerror"
-	"github.com/mcdonaldseanp/lookout/validator"
 )
 
 const STDIN_IDENTIFIER string = "__STDIN__"
@@ -22,7 +22,7 @@ func readFromStdin() string {
 	return builder.String()
 }
 
-func ChooseFileOrStdin(specfile string, use_stdin bool) (string, *rgerror.RGerror) {
+func ChooseFileOrStdin(specfile string, use_stdin bool) (string, error) {
 	if use_stdin {
 		if len(specfile) > 0 {
 			return "", &rgerror.RGerror{
@@ -49,12 +49,13 @@ func ChooseFileOrStdin(specfile string, use_stdin bool) (string, *rgerror.RGerro
 	}
 }
 
-func ReadFileOrStdin(maybe_file string) ([]byte, *rgerror.RGerror) {
+func ReadFileOrStdin(maybe_file string) ([]byte, error) {
 	var raw_data []byte
-	var rgerr *rgerror.RGerror
 	if maybe_file == STDIN_IDENTIFIER {
 		raw_data = []byte(readFromStdin())
 	} else {
+		// raw_data was already created so you have to define rgerr now too
+		var rgerr error
 		raw_data, rgerr = ReadFileInChunks(maybe_file)
 		if rgerr != nil {
 			return nil, rgerr
@@ -63,7 +64,7 @@ func ReadFileOrStdin(maybe_file string) ([]byte, *rgerror.RGerror) {
 	return raw_data, nil
 }
 
-func ReadFileInChunks(location string) ([]byte, *rgerror.RGerror) {
+func ReadFileInChunks(location string) ([]byte, error) {
 	f, err := os.OpenFile(location, os.O_RDWR|os.O_CREATE, 0755)
 	if err != nil {
 		return nil, &rgerror.RGerror{
@@ -97,7 +98,7 @@ func ReadFileInChunks(location string) ([]byte, *rgerror.RGerror) {
 	return file_contents, nil
 }
 
-func OverwriteFile(location string, data []byte) *rgerror.RGerror {
+func OverwriteFile(location string, data []byte) error {
 	f, err := os.OpenFile(location, os.O_RDWR|os.O_CREATE|os.O_TRUNC, 0755)
 	if err != nil {
 		return &rgerror.RGerror{

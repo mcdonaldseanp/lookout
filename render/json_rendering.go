@@ -7,7 +7,7 @@ import (
 	"github.com/mcdonaldseanp/lookout/rgerror"
 )
 
-func RenderJson(data interface{}) (string, *rgerror.RGerror) {
+func RenderJson(data interface{}) (string, error) {
 	json_output, json_err := json.Marshal(data)
 	if json_err != nil {
 		return "", &rgerror.RGerror{

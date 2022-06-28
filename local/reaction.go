@@ -7,7 +7,6 @@ import (
 	"github.com/mcdonaldseanp/lookout/operation"
 	"github.com/mcdonaldseanp/lookout/operparse"
 	"github.com/mcdonaldseanp/lookout/render"
-	"github.com/mcdonaldseanp/lookout/rgerror"
 )
 
 func runReaction(check_result bool, rctn operation.Reaction, actn_name string, actn *operation.Action, skipped_message string) operation.ReactionResult {
@@ -149,7 +148,7 @@ func maybeRunReaction(reaction operation.Reaction, obsv *operation.Observation, 
 	}
 }
 
-func ReactTo(rgln *operation.Operations, all_obsv_results operation.ObservationResults) (*operation.ReactionResults, *rgerror.RGerror) {
+func ReactTo(rgln *operation.Operations, all_obsv_results operation.ObservationResults) (*operation.ReactionResults, error) {
 	obsv_results := all_obsv_results.Observations
 	results := operation.ReactionResults{
 		Reactions:               make(map[string]operation.ReactionResult),
@@ -175,7 +174,7 @@ func ReactTo(rgln *operation.Operations, all_obsv_results operation.ObservationR
 	return &results, nil
 }
 
-func React(raw_data []byte) (string, *rgerror.RGerror) {
+func React(raw_data []byte) (string, error) {
 	var data operation.Operations
 	parse_rgerr := operparse.ParseOperations(raw_data, &data)
 	if parse_rgerr != nil {
@@ -195,7 +194,7 @@ func React(raw_data []byte) (string, *rgerror.RGerror) {
 	return final_result, nil
 }
 
-func CLIReact(maybe_file string) *rgerror.RGerror {
+func CLIReact(maybe_file string) error {
 	// ReadFileOrStdin performs validation on maybe_file
 	raw_data, rgerr := localfile.ReadFileOrStdin(maybe_file)
 	if rgerr != nil {

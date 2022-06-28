@@ -13,7 +13,7 @@ var RESERVED_INSTANCE_NAME string = "__obsv_instance__"
 // Idempotent function for merging new data in to Operations
 // struct. Can be used more than once to read data from multiple
 // sources
-func ParseOperations(raw_data []byte, data *operation.Operations) *rgerror.RGerror {
+func ParseOperations(raw_data []byte, data *operation.Operations) error {
 	unmarshald_data := operation.Operations{}
 	err := yaml.UnmarshalStrict(raw_data, &unmarshald_data)
 	if err != nil {
@@ -33,7 +33,7 @@ func ParseOperations(raw_data []byte, data *operation.Operations) *rgerror.RGerr
 // Yeah this is big and ugly and could probably have helper functions,
 // but I don't want to do that much interface magic and pass enough
 // strings around to make the messages different and helpful.
-func ConcatOperations(first *operation.Operations, second *operation.Operations) *rgerror.RGerror {
+func ConcatOperations(first *operation.Operations, second *operation.Operations) error {
 	var conflicts map[string]string = make(map[string]string)
 	if first.Observations == nil {
 		first.Observations = make(map[string]operation.Observation)

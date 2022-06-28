@@ -3,13 +3,13 @@ package remote
 import (
 	"fmt"
 
+	"github.com/mcdonaldseanp/clibuild/validator"
 	"github.com/mcdonaldseanp/lookout/connection"
 	"github.com/mcdonaldseanp/lookout/localfile"
 	"github.com/mcdonaldseanp/lookout/rgerror"
-	"github.com/mcdonaldseanp/lookout/validator"
 )
 
-func Observe(raw_data []byte, username string, target string, port string) (string, *rgerror.RGerror) {
+func Observe(raw_data []byte, username string, target string, port string) (string, error) {
 	rgerr := validator.ValidateParams(fmt.Sprintf(
 		`[
 			{"name":"username","value":"%s","validate":["NotEmpty"]},
@@ -31,13 +31,13 @@ func Observe(raw_data []byte, username string, target string, port string) (stri
 				ec,
 				sout,
 				serr),
-			Origin: rgerr.Origin,
+			Origin: rgerr.(*rgerror.RGerror).Origin,
 		}
 	}
 	return sout, nil
 }
 
-func CLIObserve(maybe_file string, username string, target string, port string) *rgerror.RGerror {
+func CLIObserve(maybe_file string, username string, target string, port string) error {
 	raw_data, rgerr := localfile.ReadFileOrStdin(maybe_file)
 	if rgerr != nil {
 		return rgerr

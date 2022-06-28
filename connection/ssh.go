@@ -14,7 +14,7 @@ import (
 )
 
 // Based on https://pkg.go.dev/golang.org/x/crypto/ssh/agent#example-NewClient
-func openConnectionWithAgent(username string, target string, port string) (*ssh.Client, *rgerror.RGerror) {
+func openConnectionWithAgent(username string, target string, port string) (*ssh.Client, error) {
 	socket := os.Getenv("SSH_AUTH_SOCK")
 	conn, err := net.Dial("unix", socket)
 	if err != nil {
@@ -46,7 +46,7 @@ func openConnectionWithAgent(username string, target string, port string) (*ssh.
 	return ssh_client, nil
 }
 
-func RunSSHCommand(command string, send_stdin string, username string, target string, port string) (string, string, int, *rgerror.RGerror) {
+func RunSSHCommand(command string, send_stdin string, username string, target string, port string) (string, string, int, error) {
 	client, rgerr := openConnectionWithAgent(username, target, port)
 	if rgerr != nil {
 		return "", "", -1, rgerr

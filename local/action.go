@@ -3,13 +3,13 @@ package local
 import (
 	"fmt"
 
+	"github.com/mcdonaldseanp/clibuild/validator"
 	"github.com/mcdonaldseanp/lookout/localexec"
 	"github.com/mcdonaldseanp/lookout/localfile"
 	"github.com/mcdonaldseanp/lookout/operation"
 	"github.com/mcdonaldseanp/lookout/operparse"
 	"github.com/mcdonaldseanp/lookout/render"
 	"github.com/mcdonaldseanp/lookout/rgerror"
-	"github.com/mcdonaldseanp/lookout/validator"
 )
 
 func RunAction(actn operation.Action) operation.ActionResult {
@@ -20,7 +20,7 @@ func RunAction(actn operation.Action) operation.ActionResult {
 	if cmd_rgerr != nil {
 		result.Succeeded = false
 		result.Output = output
-		result.Logs = fmt.Sprintf("Error: %s, Logs: %s", cmd_rgerr.Message, logs)
+		result.Logs = fmt.Sprintf("Error: %s, Logs: %s", cmd_rgerr.(*rgerror.RGerror).Message, logs)
 	} else {
 		result.Succeeded = true
 		result.Output = output
@@ -29,7 +29,7 @@ func RunAction(actn operation.Action) operation.ActionResult {
 	return result
 }
 
-func Run(raw_data []byte, actn_name string) (string, *rgerror.RGerror) {
+func Run(raw_data []byte, actn_name string) (string, error) {
 	rgerr := validator.ValidateParams(fmt.Sprintf(
 		`[{"name":"action name","value":"%s","validate":["NotEmpty"]}]`,
 		actn_name,
@@ -62,7 +62,7 @@ func Run(raw_data []byte, actn_name string) (string, *rgerror.RGerror) {
 	return final_result, nil
 }
 
-func CLIRun(maybe_file string, actn_name string) *rgerror.RGerror {
+func CLIRun(maybe_file string, actn_name string) error {
 	// ReadFileOrStdin performs validation on maybe_file
 	raw_data, rgerr := localfile.ReadFileOrStdin(maybe_file)
 	if rgerr != nil {

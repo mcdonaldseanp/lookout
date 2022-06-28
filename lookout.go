@@ -4,10 +4,11 @@ import (
 	"flag"
 	"os"
 
-	"github.com/mcdonaldseanp/lookout/cli"
+	"github.com/mcdonaldseanp/clibuild/cli"
 	"github.com/mcdonaldseanp/lookout/local"
 	"github.com/mcdonaldseanp/lookout/localfile"
 	"github.com/mcdonaldseanp/lookout/remote"
+	"github.com/mcdonaldseanp/lookout/version"
 )
 
 func main() {
@@ -49,9 +50,9 @@ func main() {
 				cli.ShouldHaveArgs(2, usage, description, local_flag_set)
 				input_file, rgerr := localfile.ChooseFileOrStdin(*local_input_file, *local_use_stdin)
 				if rgerr != nil {
-					cli.HandleCommandRGerror(rgerr, usage, description, local_flag_set)
+					cli.HandleCommandError(rgerr, usage, description, local_flag_set)
 				}
-				cli.HandleCommandRGerror(
+				cli.HandleCommandError(
 					local.CLIObserve(input_file),
 					usage,
 					description,
@@ -68,9 +69,9 @@ func main() {
 				cli.ShouldHaveArgs(3, usage, description, remote_flag_set)
 				input_file, rgerr := localfile.ChooseFileOrStdin(*remote_input_file, *remote_use_stdin)
 				if rgerr != nil {
-					cli.HandleCommandRGerror(rgerr, usage, description, remote_flag_set)
+					cli.HandleCommandError(rgerr, usage, description, remote_flag_set)
 				}
-				cli.HandleCommandRGerror(
+				cli.HandleCommandError(
 					remote.CLIObserve(input_file, *username, os.Args[3], *port),
 					usage,
 					description,
@@ -87,9 +88,9 @@ func main() {
 				cli.ShouldHaveArgs(2, usage, description, local_flag_set)
 				input_file, rgerr := localfile.ChooseFileOrStdin(*local_input_file, *local_use_stdin)
 				if rgerr != nil {
-					cli.HandleCommandRGerror(rgerr, usage, description, local_flag_set)
+					cli.HandleCommandError(rgerr, usage, description, local_flag_set)
 				}
-				cli.HandleCommandRGerror(
+				cli.HandleCommandError(
 					local.CLIReact(input_file),
 					usage,
 					description,
@@ -106,9 +107,9 @@ func main() {
 				cli.ShouldHaveArgs(3, usage, description, remote_flag_set)
 				input_file, rgerr := localfile.ChooseFileOrStdin(*remote_input_file, *remote_use_stdin)
 				if rgerr != nil {
-					cli.HandleCommandRGerror(rgerr, usage, description, remote_flag_set)
+					cli.HandleCommandError(rgerr, usage, description, remote_flag_set)
 				}
-				cli.HandleCommandRGerror(
+				cli.HandleCommandError(
 					remote.CLIReact(input_file, *username, os.Args[3], *port),
 					usage,
 					description,
@@ -125,9 +126,9 @@ func main() {
 				cli.ShouldHaveArgs(3, usage, description, local_flag_set)
 				input_file, rgerr := localfile.ChooseFileOrStdin(*local_input_file, *local_use_stdin)
 				if rgerr != nil {
-					cli.HandleCommandRGerror(rgerr, usage, description, local_flag_set)
+					cli.HandleCommandError(rgerr, usage, description, local_flag_set)
 				}
-				cli.HandleCommandRGerror(
+				cli.HandleCommandError(
 					local.CLIRun(input_file, os.Args[3]),
 					usage,
 					description,
@@ -144,9 +145,9 @@ func main() {
 				cli.ShouldHaveArgs(4, usage, description, remote_flag_set)
 				input_file, rgerr := localfile.ChooseFileOrStdin(*remote_input_file, *remote_use_stdin)
 				if rgerr != nil {
-					cli.HandleCommandRGerror(rgerr, usage, description, remote_flag_set)
+					cli.HandleCommandError(rgerr, usage, description, remote_flag_set)
 				}
-				cli.HandleCommandRGerror(
+				cli.HandleCommandError(
 					remote.CLIRun(input_file, os.Args[3], *username, os.Args[4], *port),
 					usage,
 					description,
@@ -161,7 +162,7 @@ func main() {
 				usage := "lookout setup remote [TARGET] [FLAGS]"
 				description := "Run actions on a target"
 				cli.ShouldHaveArgs(3, usage, description, setup_flag_set)
-				cli.HandleCommandRGerror(
+				cli.HandleCommandError(
 					remote.CLISetup(*setup_username, os.Args[3], *setup_port),
 					usage,
 					description,
@@ -171,5 +172,5 @@ func main() {
 		},
 	}
 
-	cli.RunCommand("lookout", command_list)
+	cli.RunCommand("lookout", version.VERSION, command_list)
 }

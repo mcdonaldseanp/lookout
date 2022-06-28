@@ -4,14 +4,14 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/mcdonaldseanp/clibuild/validator"
 	"github.com/mcdonaldseanp/lookout/connection"
 	"github.com/mcdonaldseanp/lookout/render"
 	"github.com/mcdonaldseanp/lookout/rgerror"
-	"github.com/mcdonaldseanp/lookout/validator"
 	"github.com/mcdonaldseanp/lookout/version"
 )
 
-func Setup(username string, target string, port string) (string, string, *rgerror.RGerror) {
+func Setup(username string, target string, port string) (string, string, error) {
 	rgerr := validator.ValidateParams(fmt.Sprintf(
 		`[
 			{"name":"username","value":"%s","validate":["NotEmpty"]},
@@ -29,9 +29,9 @@ func Setup(username string, target string, port string) (string, string, *rgerro
 		`#!/usr/bin/env bash
 
 		mkdir -p $HOME/.lookout/bin 1>&2
-		curl -L https://github.com/mcdonaldseanp/lookout/releases/download/%s/lookout > $HOME/.lookout/bin/lookout
+		curl -L %s > $HOME/.lookout/bin/lookout
 		chmod 755 $HOME/.lookout/bin/lookout 1>&2`,
-		version.VERSION,
+		version.ReleaseArtifact("lookout"),
 	)
 	sout, serr, ec, rgerr := connection.RunSSHCommand(command, "", username, target, port)
 	if rgerr != nil {
@@ -41,13 +41,13 @@ func Setup(username string, target string, port string) (string, string, *rgerro
 				ec,
 				sout,
 				serr),
-			Origin: rgerr.Origin,
+			Origin: rgerr.(*rgerror.RGerror).Origin,
 		}
 	}
 	return sout, serr, nil
 }
 
-func CLISetup(username string, target string, port string) *rgerror.RGerror {
+func CLISetup(username string, target string, port string) error {
 	_, serr, rgerr := Setup(username, target, port)
 	if rgerr != nil {
 		return rgerr

@@ -9,10 +9,9 @@ import (
 
 	"github.com/mcdonaldseanp/lookout/cli"
 	"github.com/mcdonaldseanp/lookout/localexec"
-	"github.com/mcdonaldseanp/lookout/rgerror"
 )
 
-func runGcloudInstanceList(gcloud_project string) ([]map[string]interface{}, *rgerror.RGerror) {
+func runGcloudInstanceList(gcloud_project string) ([]map[string]interface{}, error) {
 	output, logs, rgerr := localexec.ExecReadOutput("gcloud", []string{"compute", "instances", "list", "--format=json", "--project=" + gcloud_project})
 	if rgerr != nil {
 		return nil, rgerr
@@ -23,7 +22,7 @@ func runGcloudInstanceList(gcloud_project string) ([]map[string]interface{}, *rg
 	return instance_data, nil
 }
 
-func readRunningInstances(state string, gcloud_project string) *rgerror.RGerror {
+func readRunningInstances(state string, gcloud_project string) error {
 	var instance_count int = 0
 	instance_data, rgerr := runGcloudInstanceList(gcloud_project)
 	if rgerr != nil {
@@ -38,7 +37,7 @@ func readRunningInstances(state string, gcloud_project string) *rgerror.RGerror 
 	return nil
 }
 
-func readInstanceNames(state string, gcloud_project string) *rgerror.RGerror {
+func readInstanceNames(state string, gcloud_project string) error {
 	var instance_names []string
 	instance_data, rgerr := runGcloudInstanceList(gcloud_project)
 	if rgerr != nil {

@@ -26,7 +26,7 @@ func RunObservation(name string, obsv operation.Observation, impls map[string]op
 			if cmd_rgerr != nil {
 				return operation.ObservationResult{
 					Succeeded:   false,
-					Result:      "Error: " + strings.TrimSpace(cmd_rgerr.Message),
+					Result:      "Error: " + strings.TrimSpace(cmd_rgerr.(*rgerror.RGerror).Message),
 					Expected:    false,
 					Logs:        logs,
 					Observation: obsv,
@@ -70,7 +70,7 @@ func RunAllObservations(obsvs map[string]operation.Observation, impls map[string
 	return results
 }
 
-func Observe(raw_data []byte) (string, *rgerror.RGerror) {
+func Observe(raw_data []byte) (string, error) {
 	// No validators are required to run here because ParseOperations
 	// will use ReadFileOrStdin which performs validation on
 	// maybe_file
@@ -88,7 +88,7 @@ func Observe(raw_data []byte) (string, *rgerror.RGerror) {
 	return final_result, nil
 }
 
-func CLIObserve(maybe_file string) *rgerror.RGerror {
+func CLIObserve(maybe_file string) error {
 	// ReadFileOrStdin performs validation on maybe_file
 	raw_data, rgerr := localfile.ReadFileOrStdin(maybe_file)
 	if rgerr != nil {
