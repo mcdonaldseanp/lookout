@@ -7,8 +7,8 @@ import (
 	"os"
 	"strings"
 
+	"github.com/mcdonaldseanp/clibuild/errtype"
 	"github.com/mcdonaldseanp/clibuild/validator"
-	"github.com/mcdonaldseanp/lookout/rgerror"
 )
 
 const STDIN_IDENTIFIER string = "__STDIN__"
@@ -25,9 +25,8 @@ func readFromStdin() string {
 func ChooseFileOrStdin(specfile string, use_stdin bool) (string, error) {
 	if use_stdin {
 		if len(specfile) > 0 {
-			return "", &rgerror.RGerror{
-				Kind:    rgerror.InvalidInput,
-				Message: "Cannot specify both a file and to use stdin",
+			return "", &errtype.InvalidInput{
+				Message: "cannot specify both a file and to use stdin",
 				Origin:  nil,
 			}
 		}
@@ -38,12 +37,12 @@ func ChooseFileOrStdin(specfile string, use_stdin bool) (string, error) {
 		//
 		// Cheat a little with the validator: this function is mostly used
 		// for the CLI commands, so use a name that shows it's the flag
-		rgerr := validator.ValidateParams(fmt.Sprintf(
+		err := validator.ValidateParams(fmt.Sprintf(
 			`[{"name":"--file","value":"%s","validate":["NotEmpty","IsFile"]}]`,
 			specfile,
 		))
-		if rgerr != nil {
-			return "", rgerr
+		if err != nil {
+			return "", err
 		}
 		return specfile, nil
 	}
@@ -54,11 +53,11 @@ func ReadFileOrStdin(maybe_file string) ([]byte, error) {
 	if maybe_file == STDIN_IDENTIFIER {
 		raw_data = []byte(readFromStdin())
 	} else {
-		// raw_data was already created so you have to define rgerr now too
-		var rgerr error
-		raw_data, rgerr = ReadFileInChunks(maybe_file)
-		if rgerr != nil {
-			return nil, rgerr
+		// raw_data was already created so you have to define err now too
+		var err error
+		raw_data, err = ReadFileInChunks(maybe_file)
+		if err != nil {
+			return nil, err
 		}
 	}
 	return raw_data, nil
@@ -67,11 +66,7 @@ func ReadFileOrStdin(maybe_file string) ([]byte, error) {
 func ReadFileInChunks(location string) ([]byte, error) {
 	f, err := os.OpenFile(location, os.O_RDWR|os.O_CREATE, 0755)
 	if err != nil {
-		return nil, &rgerror.RGerror{
-			Kind:    rgerror.ExecError,
-			Message: fmt.Sprintf("Failed to open file:\n%s", err),
-			Origin:  err,
-		}
+		return nil, fmt.Errorf("failed to open file:\n%s", err)
 	}
 	defer f.Close()
 
@@ -85,11 +80,7 @@ func ReadFileInChunks(location string) ([]byte, error) {
 		}
 		if err != nil {
 			if err != io.EOF {
-				return nil, &rgerror.RGerror{
-					Kind:    rgerror.ExecError,
-					Message: fmt.Sprintf("Failed to read file:\n%s", err),
-					Origin:  err,
-				}
+				return nil, fmt.Errorf("failed to read file:\n%s", err)
 			} else {
 				break
 			}
@@ -101,20 +92,12 @@ func ReadFileInChunks(location string) ([]byte, error) {
 func OverwriteFile(location string, data []byte) error {
 	f, err := os.OpenFile(location, os.O_RDWR|os.O_CREATE|os.O_TRUNC, 0755)
 	if err != nil {
-		return &rgerror.RGerror{
-			Kind:    rgerror.ExecError,
-			Message: fmt.Sprintf("Failed to open file:\n%s", err),
-			Origin:  err,
-		}
+		return fmt.Errorf("failed to open file:\n%s", err)
 	}
 	defer f.Close()
 	_, err = f.Write(data)
 	if err != nil {
-		return &rgerror.RGerror{
-			Kind:    rgerror.ExecError,
-			Message: fmt.Sprintf("Failed to write to file:\n%s", err),
-			Origin:  err,
-		}
+		return fmt.Errorf("failed to write to file:\n%s", err)
 	}
 	return nil
 }

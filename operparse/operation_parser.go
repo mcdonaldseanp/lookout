@@ -3,8 +3,8 @@ package operparse
 import (
 	"fmt"
 
+	"github.com/mcdonaldseanp/clibuild/errtype"
 	"github.com/mcdonaldseanp/lookout/operation"
-	"github.com/mcdonaldseanp/lookout/rgerror"
 	"gopkg.in/yaml.v2"
 )
 
@@ -17,15 +17,11 @@ func ParseOperations(raw_data []byte, data *operation.Operations) error {
 	unmarshald_data := operation.Operations{}
 	err := yaml.UnmarshalStrict(raw_data, &unmarshald_data)
 	if err != nil {
-		return &rgerror.RGerror{
-			Kind:    rgerror.ExecError,
-			Message: fmt.Sprintf("Failed to parse yaml:\n%s", err),
-			Origin:  err,
-		}
+		return fmt.Errorf("failed to parse yaml:\n%s", err)
 	}
-	rgerr := ConcatOperations(data, &unmarshald_data)
-	if rgerr != nil {
-		return rgerr
+	err = ConcatOperations(data, &unmarshald_data)
+	if err != nil {
+		return err
 	}
 	return nil
 }
@@ -49,8 +45,7 @@ func ConcatOperations(first *operation.Operations, second *operation.Operations)
 	}
 	for obsv_name, obsv := range second.Observations {
 		if obsv.Empty() {
-			return &rgerror.RGerror{
-				Kind:    rgerror.InvalidInput,
+			return &errtype.InvalidInput{
 				Message: fmt.Sprintf("Observation '%s' is empty, observations must have all of 'entity', 'query', and 'instance' set", obsv_name),
 				Origin:  nil,
 			}
@@ -65,8 +60,7 @@ func ConcatOperations(first *operation.Operations, second *operation.Operations)
 				// add this latest observation to the conflicts map because
 				// there's already a matching hash there
 				if first.Observations[conflict].Expect != obsv.Expect {
-					return &rgerror.RGerror{
-						Kind:    rgerror.InvalidInput,
+					return &errtype.InvalidInput{
 						Message: fmt.Sprintf("Observation '%s' conflicts with '%s'", obsv_name, conflict),
 						Origin:  nil,
 					}
@@ -79,16 +73,14 @@ func ConcatOperations(first *operation.Operations, second *operation.Operations)
 	}
 	for rctn_name, rctn := range second.Reactions {
 		if rctn.Empty() {
-			return &rgerror.RGerror{
-				Kind:    rgerror.InvalidInput,
+			return &errtype.InvalidInput{
 				Message: fmt.Sprintf("Reaction '%s' is empty, reactions must have all of 'observation', 'action', and 'condition check/value' set", rctn_name),
 				Origin:  nil,
 			}
 		}
 		for _, key := range rctn.HashKeys() {
 			if conflict, conflicted := conflicts[key]; conflicted == true {
-				return &rgerror.RGerror{
-					Kind:    rgerror.InvalidInput,
+				return &errtype.InvalidInput{
 					Message: fmt.Sprintf("Reaction '%s' conflicts with '%s'", rctn_name, conflict),
 					Origin:  nil,
 				}
@@ -100,16 +92,14 @@ func ConcatOperations(first *operation.Operations, second *operation.Operations)
 	}
 	for actn_name, actn := range second.Actions {
 		if actn.Empty() {
-			return &rgerror.RGerror{
-				Kind:    rgerror.InvalidInput,
+			return &errtype.InvalidInput{
 				Message: fmt.Sprintf("Action '%s' is empty, actions must have 'exe' and one of 'path' or 'script' set", actn_name),
 				Origin:  nil,
 			}
 		}
 		for _, key := range actn.HashKeys() {
 			if conflict, conflicted := conflicts[key]; conflicted == true {
-				return &rgerror.RGerror{
-					Kind:    rgerror.InvalidInput,
+				return &errtype.InvalidInput{
 					Message: fmt.Sprintf("Action '%s' conflicts with '%s'", actn_name, conflict),
 					Origin:  nil,
 				}
@@ -121,16 +111,14 @@ func ConcatOperations(first *operation.Operations, second *operation.Operations)
 	}
 	for impl_name, impl := range second.Implements {
 		if impl.Empty() {
-			return &rgerror.RGerror{
-				Kind:    rgerror.InvalidInput,
+			return &errtype.InvalidInput{
 				Message: fmt.Sprintf("Implement '%s' is empty, implements must have 'exe' set, one of 'path' or 'script' set, and either react or observe or both", impl_name),
 				Origin:  nil,
 			}
 		}
 		for _, key := range impl.HashKeys() {
 			if conflict, conflicted := conflicts[key]; conflicted == true {
-				return &rgerror.RGerror{
-					Kind:    rgerror.InvalidInput,
+				return &errtype.InvalidInput{
 					Message: fmt.Sprintf("Implement '%s' conflicts with '%s'", impl_name, conflict),
 					Origin:  nil,
 				}

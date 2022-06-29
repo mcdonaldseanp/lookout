@@ -13,9 +13,9 @@ import (
 )
 
 func runGcloudInstanceList(gcloud_project string) ([]map[string]interface{}, error) {
-	output, logs, rgerr := localexec.ExecReadOutput("gcloud", []string{"compute", "instances", "list", "--format=json", "--project=" + gcloud_project})
-	if rgerr != nil {
-		return nil, rgerr
+	output, logs, err := localexec.ExecReadOutput("gcloud", []string{"compute", "instances", "list", "--format=json", "--project=" + gcloud_project})
+	if err != nil {
+		return nil, err
 	}
 	fmt.Fprint(os.Stderr, logs)
 	var instance_data []map[string]interface{}
@@ -25,9 +25,9 @@ func runGcloudInstanceList(gcloud_project string) ([]map[string]interface{}, err
 
 func readRunningInstances(state string, gcloud_project string) error {
 	var instance_count int = 0
-	instance_data, rgerr := runGcloudInstanceList(gcloud_project)
-	if rgerr != nil {
-		return rgerr
+	instance_data, err := runGcloudInstanceList(gcloud_project)
+	if err != nil {
+		return err
 	}
 	for _, instance := range instance_data {
 		if instance["status"] == state {
@@ -40,9 +40,9 @@ func readRunningInstances(state string, gcloud_project string) error {
 
 func readInstanceNames(state string, gcloud_project string) error {
 	var instance_names []string
-	instance_data, rgerr := runGcloudInstanceList(gcloud_project)
-	if rgerr != nil {
-		return rgerr
+	instance_data, err := runGcloudInstanceList(gcloud_project)
+	if err != nil {
+		return err
 	}
 	for _, instance := range instance_data {
 		if instance["status"] == state {

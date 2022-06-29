@@ -176,19 +176,19 @@ func ReactTo(rgln *operation.Operations, all_obsv_results operation.ObservationR
 
 func React(raw_data []byte) (string, error) {
 	var data operation.Operations
-	parse_rgerr := operparse.ParseOperations(raw_data, &data)
-	if parse_rgerr != nil {
-		return "", parse_rgerr
+	parse_err := operparse.ParseOperations(raw_data, &data)
+	if parse_err != nil {
+		return "", parse_err
 	}
 
 	obsv_results := RunAllObservations(data.Observations, data.Implements)
-	results, rgerr := ReactTo(&data, obsv_results)
-	if rgerr != nil {
-		return "", rgerr
+	results, err := ReactTo(&data, obsv_results)
+	if err != nil {
+		return "", err
 	}
-	final_result, parse_rgerr := render.RenderJson(results)
-	if parse_rgerr != nil {
-		return "", parse_rgerr
+	final_result, parse_err := render.RenderJson(results)
+	if parse_err != nil {
+		return "", parse_err
 	}
 
 	return final_result, nil
@@ -196,13 +196,13 @@ func React(raw_data []byte) (string, error) {
 
 func CLIReact(maybe_file string) error {
 	// ReadFileOrStdin performs validation on maybe_file
-	raw_data, rgerr := localfile.ReadFileOrStdin(maybe_file)
-	if rgerr != nil {
-		return rgerr
+	raw_data, err := localfile.ReadFileOrStdin(maybe_file)
+	if err != nil {
+		return err
 	}
-	result, rgerr := React(raw_data)
-	if rgerr != nil {
-		return rgerr
+	result, err := React(raw_data)
+	if err != nil {
+		return err
 	}
 	fmt.Printf(result)
 	return nil

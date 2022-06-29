@@ -7,7 +7,7 @@ import (
 	"os"
 	"strings"
 
-	"github.com/mcdonaldseanp/lookout/rgerror"
+	"github.com/mcdonaldseanp/clibuild/errtype"
 	"github.com/mcdonaldseanp/lookout/sanitize"
 	"golang.org/x/crypto/ssh"
 	"golang.org/x/crypto/ssh/agent"
@@ -18,11 +18,7 @@ func openConnectionWithAgent(username string, target string, port string) (*ssh.
 	socket := os.Getenv("SSH_AUTH_SOCK")
 	conn, err := net.Dial("unix", socket)
 	if err != nil {
-		return nil, &rgerror.RGerror{
-			Kind:    rgerror.ExecError,
-			Message: fmt.Sprintf("Failed to connect to ssh agent"),
-			Origin:  err,
-		}
+		return nil, fmt.Errorf("failed to connect to ssh agent")
 	}
 	agentClient := agent.NewClient(conn)
 	config := &ssh.ClientConfig{
@@ -37,29 +33,21 @@ func openConnectionWithAgent(username string, target string, port string) (*ssh.
 
 	ssh_client, err := ssh.Dial("tcp", target+":"+port, config)
 	if err != nil {
-		return nil, &rgerror.RGerror{
-			Kind:    rgerror.ExecError,
-			Message: fmt.Sprintf("Failed to open ssh connection to %s", target),
-			Origin:  err,
-		}
+		return nil, fmt.Errorf("failed to open ssh connection to %s", target)
 	}
 	return ssh_client, nil
 }
 
 func RunSSHCommand(command string, send_stdin string, username string, target string, port string) (string, string, int, error) {
-	client, rgerr := openConnectionWithAgent(username, target, port)
-	if rgerr != nil {
-		return "", "", -1, rgerr
+	client, err := openConnectionWithAgent(username, target, port)
+	if err != nil {
+		return "", "", -1, err
 	}
 	defer client.Close()
 
 	session, err := client.NewSession()
 	if err != nil {
-		return "", "", -1, &rgerror.RGerror{
-			Kind:    rgerror.ExecError,
-			Message: fmt.Sprintf("Failed to open new ssh session to %s", target),
-			Origin:  err,
-		}
+		return "", "", -1, fmt.Errorf("failed to open new ssh session to %s", target)
 	}
 	defer session.Close()
 	var read_stdout, read_stderr bytes.Buffer
@@ -85,8 +73,7 @@ func RunSSHCommand(command string, send_stdin string, username string, target st
 		// All I ever wanted to do was return the exit code from this function
 		if exitError, ok := err.(*ssh.ExitError); ok {
 			exit_status := exitError.Waitmsg.ExitStatus()
-			return command_stdout, command_stderr, exit_status, &rgerror.RGerror{
-				Kind: rgerror.RemoteExecError,
+			return command_stdout, command_stderr, exit_status, &errtype.RemoteShellError{
 				Message: fmt.Sprintf("Remote command \"%s\" exited with non-zero exit status %d\n\nStdout:\n%s\nStderr:\n%s\n",
 					command,
 					exit_status,
@@ -95,8 +82,7 @@ func RunSSHCommand(command string, send_stdin string, username string, target st
 				Origin: err,
 			}
 		} else {
-			return command_stdout, command_stderr, -1, &rgerror.RGerror{
-				Kind: rgerror.RemoteExecError,
+			return command_stdout, command_stderr, -1, &errtype.RemoteShellError{
 				Message: fmt.Sprintf("Remote command \"%s\" exited with non-zero exit status %s\n\nStdout:\n%s\nStderr:\n%s\n",
 					command,
 					"unknown",

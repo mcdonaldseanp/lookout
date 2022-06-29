@@ -1,4 +1,4 @@
-GO_PACKAGES=. ./connection ./local ./localexec ./localfile ./operation ./operparse ./remote ./render ./rgerror ./sanitize ./version
+GO_PACKAGES=. ./connection ./local ./localexec ./localfile ./operation ./operparse ./remote ./render ./sanitize ./version
 GO_MODULE_NAME=github.com/mcdonaldseanp/lookout
 GO_BIN_NAME=lookout
 ifneq ($(shell $(GO_BIN_NAME) -h 2>&1),)

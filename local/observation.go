@@ -9,7 +9,6 @@ import (
 	"github.com/mcdonaldseanp/lookout/operation"
 	"github.com/mcdonaldseanp/lookout/operparse"
 	"github.com/mcdonaldseanp/lookout/render"
-	"github.com/mcdonaldseanp/lookout/rgerror"
 )
 
 func RunObservation(name string, obsv operation.Observation, impls map[string]operation.Implement) operation.ObservationResult {
@@ -22,11 +21,11 @@ func RunObservation(name string, obsv operation.Observation, impls map[string]op
 			impl_script := impl.Script
 			executable := impl.Exe
 			args := operparse.ComputeArgs(impl.Observes.Args, obsv)
-			output, logs, cmd_rgerr := localexec.BuildAndRunCommand(executable, impl_file, impl_script, args)
-			if cmd_rgerr != nil {
+			output, logs, cmd_err := localexec.BuildAndRunCommand(executable, impl_file, impl_script, args)
+			if cmd_err != nil {
 				return operation.ObservationResult{
 					Succeeded:   false,
-					Result:      "Error: " + strings.TrimSpace(cmd_rgerr.(*rgerror.RGerror).Message),
+					Result:      "Error: " + strings.TrimSpace(cmd_err.Error()),
 					Expected:    false,
 					Logs:        logs,
 					Observation: obsv,
@@ -75,14 +74,14 @@ func Observe(raw_data []byte) (string, error) {
 	// will use ReadFileOrStdin which performs validation on
 	// maybe_file
 	var data operation.Operations
-	parse_rgerr := operparse.ParseOperations(raw_data, &data)
-	if parse_rgerr != nil {
-		return "", parse_rgerr
+	parse_err := operparse.ParseOperations(raw_data, &data)
+	if parse_err != nil {
+		return "", parse_err
 	}
 	results := RunAllObservations(data.Observations, data.Implements)
-	final_result, parse_rgerr := render.RenderJson(results)
-	if parse_rgerr != nil {
-		return "", parse_rgerr
+	final_result, parse_err := render.RenderJson(results)
+	if parse_err != nil {
+		return "", parse_err
 	}
 
 	return final_result, nil
@@ -90,13 +89,13 @@ func Observe(raw_data []byte) (string, error) {
 
 func CLIObserve(maybe_file string) error {
 	// ReadFileOrStdin performs validation on maybe_file
-	raw_data, rgerr := localfile.ReadFileOrStdin(maybe_file)
-	if rgerr != nil {
-		return rgerr
+	raw_data, err := localfile.ReadFileOrStdin(maybe_file)
+	if err != nil {
+		return err
 	}
-	result, rgerr := Observe(raw_data)
-	if rgerr != nil {
-		return rgerr
+	result, err := Observe(raw_data)
+	if err != nil {
+		return err
 	}
 	fmt.Printf(result)
 	return nil

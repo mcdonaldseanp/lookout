@@ -3,24 +3,24 @@ package local
 import (
 	"fmt"
 
+	"github.com/mcdonaldseanp/clibuild/errtype"
 	"github.com/mcdonaldseanp/clibuild/validator"
 	"github.com/mcdonaldseanp/lookout/localexec"
 	"github.com/mcdonaldseanp/lookout/localfile"
 	"github.com/mcdonaldseanp/lookout/operation"
 	"github.com/mcdonaldseanp/lookout/operparse"
 	"github.com/mcdonaldseanp/lookout/render"
-	"github.com/mcdonaldseanp/lookout/rgerror"
 )
 
 func RunAction(actn operation.Action) operation.ActionResult {
 	result := operation.ActionResult{
 		Action: actn,
 	}
-	output, logs, cmd_rgerr := localexec.BuildAndRunCommand(actn.Exe, actn.Path, actn.Script, actn.Args)
-	if cmd_rgerr != nil {
+	output, logs, cmd_err := localexec.BuildAndRunCommand(actn.Exe, actn.Path, actn.Script, actn.Args)
+	if cmd_err != nil {
 		result.Succeeded = false
 		result.Output = output
-		result.Logs = fmt.Sprintf("Error: %s, Logs: %s", cmd_rgerr.(*rgerror.RGerror).Message, logs)
+		result.Logs = fmt.Sprintf("Error: %s, Logs: %s", cmd_err.(*errtype.ShellError).Message, logs)
 	} else {
 		result.Succeeded = true
 		result.Output = output
@@ -30,22 +30,21 @@ func RunAction(actn operation.Action) operation.ActionResult {
 }
 
 func Run(raw_data []byte, actn_name string) (string, error) {
-	rgerr := validator.ValidateParams(fmt.Sprintf(
+	err := validator.ValidateParams(fmt.Sprintf(
 		`[{"name":"action name","value":"%s","validate":["NotEmpty"]}]`,
 		actn_name,
 	))
-	if rgerr != nil {
-		return "", rgerr
+	if err != nil {
+		return "", err
 	}
 	var data operation.Operations
-	parse_rgerr := operparse.ParseOperations(raw_data, &data)
-	if parse_rgerr != nil {
-		return "", parse_rgerr
+	parse_err := operparse.ParseOperations(raw_data, &data)
+	if parse_err != nil {
+		return "", parse_err
 	}
 	actn := operparse.SelectAction(actn_name, data.Actions)
 	if actn == nil {
-		return "", &rgerror.RGerror{
-			Kind:    rgerror.InvalidInput,
+		return "", &errtype.InvalidInput{
 			Message: fmt.Sprintf("Name \"%s\" does not match any existing action names", actn_name),
 			Origin:  nil,
 		}
@@ -55,22 +54,22 @@ func Run(raw_data []byte, actn_name string) (string, error) {
 	raw_final_result.Actions[actn_name] = result
 	// The result for actions (for now) is an actionresults set with one action
 	// result in the actions field.
-	final_result, parse_rgerr := render.RenderJson(raw_final_result)
-	if parse_rgerr != nil {
-		return "", parse_rgerr
+	final_result, parse_err := render.RenderJson(raw_final_result)
+	if parse_err != nil {
+		return "", parse_err
 	}
 	return final_result, nil
 }
 
 func CLIRun(maybe_file string, actn_name string) error {
 	// ReadFileOrStdin performs validation on maybe_file
-	raw_data, rgerr := localfile.ReadFileOrStdin(maybe_file)
-	if rgerr != nil {
-		return rgerr
+	raw_data, err := localfile.ReadFileOrStdin(maybe_file)
+	if err != nil {
+		return err
 	}
-	result, rgerr := Run(raw_data, actn_name)
-	if rgerr != nil {
-		return rgerr
+	result, err := Run(raw_data, actn_name)
+	if err != nil {
+		return err
 	}
 	fmt.Print(result)
 	return nil

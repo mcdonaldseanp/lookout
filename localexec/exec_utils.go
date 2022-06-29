@@ -6,8 +6,8 @@ import (
 	"os"
 	"os/exec"
 
+	"github.com/mcdonaldseanp/clibuild/errtype"
 	"github.com/mcdonaldseanp/lookout/localfile"
-	"github.com/mcdonaldseanp/lookout/rgerror"
 	"github.com/mcdonaldseanp/lookout/sanitize"
 )
 
@@ -21,8 +21,7 @@ func ExecReadOutput(executable string, args []string) (string, string, error) {
 	output := sanitize.ReplaceAllNewlines(stdout.String())
 	logs := sanitize.ReplaceAllNewlines(stderr.String())
 	if err != nil {
-		return output, logs, &rgerror.RGerror{
-			Kind:    rgerror.ShellError,
+		return output, logs, &errtype.ShellError{
 			Message: fmt.Sprintf("Command '%s' failed:\n%s\nstderr:\n%s", shell_command, err, logs),
 			Origin:  err,
 		}
@@ -33,11 +32,7 @@ func ExecReadOutput(executable string, args []string) (string, string, error) {
 func ExecScriptReadOutput(executable string, script string, args []string) (string, string, error) {
 	f, err := os.CreateTemp("", "lookout_script")
 	if err != nil {
-		return "", "", &rgerror.RGerror{
-			Kind:    rgerror.ShellError,
-			Message: "Could not create tmp file!",
-			Origin:  err,
-		}
+		return "", "", fmt.Errorf("Could not create tmp file!")
 	}
 	filename := f.Name()
 	defer os.Remove(filename) // clean up
@@ -48,17 +43,17 @@ func ExecScriptReadOutput(executable string, script string, args []string) (stri
 
 func BuildAndRunCommand(executable string, file string, script string, args []string) (string, string, error) {
 	var output, logs string
-	var rgerr error
+	var err error
 	if len(file) > 0 {
 		final_args := append([]string{file}, args...)
-		output, logs, rgerr = ExecReadOutput(executable, final_args)
+		output, logs, err = ExecReadOutput(executable, final_args)
 	} else if len(script) > 0 {
-		output, logs, rgerr = ExecScriptReadOutput(executable, script, args)
+		output, logs, err = ExecScriptReadOutput(executable, script, args)
 	} else {
-		output, logs, rgerr = ExecReadOutput(executable, args)
+		output, logs, err = ExecReadOutput(executable, args)
 	}
-	if rgerr != nil {
-		return output, logs, rgerr
+	if err != nil {
+		return output, logs, err
 	}
 
 	return output, logs, nil

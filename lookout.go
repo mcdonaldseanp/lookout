@@ -48,9 +48,9 @@ func main() {
 				usage := "lookout observe local [FLAGS]"
 				description := "Run observation code on the local system and print out the resulting observations"
 				cli.ShouldHaveArgs(2, usage, description, local_flag_set)
-				input_file, rgerr := localfile.ChooseFileOrStdin(*local_input_file, *local_use_stdin)
-				if rgerr != nil {
-					cli.HandleCommandError(rgerr, usage, description, local_flag_set)
+				input_file, err := localfile.ChooseFileOrStdin(*local_input_file, *local_use_stdin)
+				if err != nil {
+					cli.HandleCommandError(err, usage, description, local_flag_set)
 				}
 				cli.HandleCommandError(
 					local.CLIObserve(input_file),
@@ -67,9 +67,9 @@ func main() {
 				usage := "lookout observe remote [TARGET] [FLAGS]"
 				description := "Run observation on a target"
 				cli.ShouldHaveArgs(3, usage, description, remote_flag_set)
-				input_file, rgerr := localfile.ChooseFileOrStdin(*remote_input_file, *remote_use_stdin)
-				if rgerr != nil {
-					cli.HandleCommandError(rgerr, usage, description, remote_flag_set)
+				input_file, err := localfile.ChooseFileOrStdin(*remote_input_file, *remote_use_stdin)
+				if err != nil {
+					cli.HandleCommandError(err, usage, description, remote_flag_set)
 				}
 				cli.HandleCommandError(
 					remote.CLIObserve(input_file, *username, os.Args[3], *port),
@@ -86,9 +86,9 @@ func main() {
 				usage := "lookout react local [FLAGS]"
 				description := "React to an observation on the local system"
 				cli.ShouldHaveArgs(2, usage, description, local_flag_set)
-				input_file, rgerr := localfile.ChooseFileOrStdin(*local_input_file, *local_use_stdin)
-				if rgerr != nil {
-					cli.HandleCommandError(rgerr, usage, description, local_flag_set)
+				input_file, err := localfile.ChooseFileOrStdin(*local_input_file, *local_use_stdin)
+				if err != nil {
+					cli.HandleCommandError(err, usage, description, local_flag_set)
 				}
 				cli.HandleCommandError(
 					local.CLIReact(input_file),
@@ -105,9 +105,9 @@ func main() {
 				usage := "lookout react remote [TARGET] [FLAGS]"
 				description := "React to an observation on a target"
 				cli.ShouldHaveArgs(3, usage, description, remote_flag_set)
-				input_file, rgerr := localfile.ChooseFileOrStdin(*remote_input_file, *remote_use_stdin)
-				if rgerr != nil {
-					cli.HandleCommandError(rgerr, usage, description, remote_flag_set)
+				input_file, err := localfile.ChooseFileOrStdin(*remote_input_file, *remote_use_stdin)
+				if err != nil {
+					cli.HandleCommandError(err, usage, description, remote_flag_set)
 				}
 				cli.HandleCommandError(
 					remote.CLIReact(input_file, *username, os.Args[3], *port),
@@ -124,9 +124,9 @@ func main() {
 				usage := "lookout run local [ACTION NAME] [FLAGS]"
 				description := "Run an action on the local system"
 				cli.ShouldHaveArgs(3, usage, description, local_flag_set)
-				input_file, rgerr := localfile.ChooseFileOrStdin(*local_input_file, *local_use_stdin)
-				if rgerr != nil {
-					cli.HandleCommandError(rgerr, usage, description, local_flag_set)
+				input_file, err := localfile.ChooseFileOrStdin(*local_input_file, *local_use_stdin)
+				if err != nil {
+					cli.HandleCommandError(err, usage, description, local_flag_set)
 				}
 				cli.HandleCommandError(
 					local.CLIRun(input_file, os.Args[3]),
@@ -143,9 +143,9 @@ func main() {
 				usage := "lookout run remote [ACTION NAME] [TARGET] [FLAGS]"
 				description := "Run actions on a target"
 				cli.ShouldHaveArgs(4, usage, description, remote_flag_set)
-				input_file, rgerr := localfile.ChooseFileOrStdin(*remote_input_file, *remote_use_stdin)
-				if rgerr != nil {
-					cli.HandleCommandError(rgerr, usage, description, remote_flag_set)
+				input_file, err := localfile.ChooseFileOrStdin(*remote_input_file, *remote_use_stdin)
+				if err != nil {
+					cli.HandleCommandError(err, usage, description, remote_flag_set)
 				}
 				cli.HandleCommandError(
 					remote.CLIRun(input_file, os.Args[3], *username, os.Args[4], *port),
