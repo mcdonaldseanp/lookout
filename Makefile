@@ -21,9 +21,7 @@ build-implements:
 		cd $$DIR && \
 		make build && \
 		cd ..; \
-	done && \
-	cd .. && \
-	git checkout -- implements/**/go.mod
+	done
 
 build: build-lookout build-implements
 
