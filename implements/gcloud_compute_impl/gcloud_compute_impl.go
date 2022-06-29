@@ -7,8 +7,9 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/mcdonaldseanp/lookout/cli"
+	"github.com/mcdonaldseanp/clibuild/cli"
 	"github.com/mcdonaldseanp/lookout/localexec"
+	"github.com/mcdonaldseanp/lookout/version"
 )
 
 func runGcloudInstanceList(gcloud_project string) ([]map[string]interface{}, error) {
@@ -62,7 +63,7 @@ func main() {
 				usage := "gcloud_compute_impl count instances [STATE] [GCLOUD_PROJECT]"
 				description := "count the number of gcloud instances in STATE"
 				cli.ShouldHaveArgs(4, usage, description, nil)
-				cli.HandleCommandRGerror(
+				cli.HandleCommandError(
 					readRunningInstances(os.Args[3], os.Args[4]),
 					usage,
 					description,
@@ -78,7 +79,7 @@ func main() {
 				usage := "gcloud_compute_impl list instances [STATE] [GCLOUD_PROJECT]"
 				description := "return instance names for any instances in STATE"
 				cli.ShouldHaveArgs(4, usage, description, nil)
-				cli.HandleCommandRGerror(
+				cli.HandleCommandError(
 					readInstanceNames(os.Args[3], os.Args[4]),
 					usage,
 					description,
@@ -88,5 +89,5 @@ func main() {
 			},
 		},
 	}
-	cli.RunCommand("gcloud_compute_impl", command_list)
+	cli.RunCommand("gcloud_compute_impl", version.VERSION, command_list)
 }
