@@ -89,5 +89,5 @@ func main() {
 			},
 		},
 	}
-	cli.RunCommand("gcloud_compute_impl", version.VERSION, command_list)
+	cli.RunCommandRaw("gcloud_compute_impl", version.VERSION, command_list)
 }
