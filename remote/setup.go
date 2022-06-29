@@ -29,6 +29,7 @@ func Setup(username string, target string, port string) (string, string, error) 
 		`#!/usr/bin/env bash
 
 		mkdir -p $HOME/.lookout/bin 1>&2
+		mkdir -p $HOME/.lookout/impls 1>&2
 		curl -L %s > $HOME/.lookout/bin/lookout
 		chmod 755 $HOME/.lookout/bin/lookout 1>&2`,
 		version.ReleaseArtifact("lookout"),

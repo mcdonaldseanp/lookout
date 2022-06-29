@@ -20,12 +20,29 @@ func RunObservation(name string, obsv operation.Observation, impls map[string]op
 			impl_file := impl.Path
 			impl_script := impl.Script
 			executable := impl.Exe
+			dwld_file, err := DownloadImplement(&impl)
+			if err != nil {
+				return operation.ObservationResult{
+					Succeeded:   false,
+					Result:      "failed to download implement",
+					Expected:    false,
+					Logs:        err.Error(),
+					Observation: obsv,
+				}
+			} else if len(dwld_file) > 0 {
+				if len(executable) > 0 {
+					impl_file = dwld_file
+				} else {
+					impl_file = ""
+					executable = dwld_file
+				}
+			}
 			args := operparse.ComputeArgs(impl.Observes.Args, obsv)
 			output, logs, cmd_err := localexec.BuildAndRunCommand(executable, impl_file, impl_script, args)
 			if cmd_err != nil {
 				return operation.ObservationResult{
 					Succeeded:   false,
-					Result:      "Error: " + strings.TrimSpace(cmd_err.Error()),
+					Result:      "error: " + strings.TrimSpace(cmd_err.Error()),
 					Expected:    false,
 					Logs:        logs,
 					Observation: obsv,
@@ -48,7 +65,7 @@ func RunObservation(name string, obsv operation.Observation, impls map[string]op
 	}
 	return operation.ObservationResult{
 		Succeeded:   false,
-		Result:      "Error: No implement found for observation '" + name + "'",
+		Result:      "error: No implement found for observation '" + name + "'",
 		Observation: obsv,
 	}
 }

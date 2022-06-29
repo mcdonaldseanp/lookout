@@ -184,11 +184,13 @@ type ObservationImplement struct {
 }
 
 type Implement struct {
-	Path     string               `yaml:"path,omitempty" json:"path,omitempty"`
-	Script   string               `yaml:"script,omitempty" json:"script,omitempty"`
-	Exe      string               `yaml:"exe" json:"exe"`
-	Reacts   ReactionImplement    `yaml:"reacts,omitempty" json:"reacts,omitempty"`
-	Observes ObservationImplement `yaml:"observes,omitempty" json:"observes,omitempty"`
+	Path        string               `yaml:"path,omitempty" json:"path,omitempty"`
+	Script      string               `yaml:"script,omitempty" json:"script,omitempty"`
+	Exe         string               `yaml:"exe,omitempty" json:"exe,omitempty"`
+	Source_File string               `yaml:"source_file,omitempty" json:"source_file,omitempty"`
+	Source_Url  string               `yaml:"source_url,omitempty" json:"source_url,omitempty"`
+	Reacts      ReactionImplement    `yaml:"reacts,omitempty" json:"reacts,omitempty"`
+	Observes    ObservationImplement `yaml:"observes,omitempty" json:"observes,omitempty"`
 }
 
 func emptyObserves(impl Implement) bool {
@@ -255,14 +257,23 @@ func (impl Implement) HashKeys() []string {
 	return result
 }
 
-// I'm not positive this is true, but can't think
-// of whether or not an implement can omit
-// both reacting and observing (I'm pretty
-// sure they are useless without that)
 func (impl Implement) Empty() bool {
-	if impl.Exe == "" {
+	// Exe can _only_ be empty if Source_File is provided, since
+	// the source file will substitute for the missing exe
+	if len(impl.Exe) < 1 && len(impl.Source_File) < 1 {
 		return true
 	}
+	// impls must have one of:
+	// * A complete source, including file and url
+	// * A path
+	// * A script
+	if (len(impl.Source_File) < 1 && len(impl.Source_Url) < 1) && len(impl.Path) < 1 && len(impl.Script) < 1 {
+		return true
+	}
+	// I'm not positive this is true, but can't think
+	// of whether or not an implement can omit
+	// both reacting and observing (I'm pretty
+	// sure they are useless without that)
 	if emptyReacts(impl) && emptyObserves(impl) {
 		return true
 	}

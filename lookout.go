@@ -42,12 +42,13 @@ func main() {
 	// Also, try to keep these in alphabetical order. The list is already long enough
 	command_list := []cli.Command{
 		{
-			Verb: "observe",
-			Noun: "local",
+			Verb:     "observe",
+			Noun:     "local",
+			Supports: []string{"linux", "windows"},
 			ExecutionFn: func() {
 				usage := "lookout observe local [FLAGS]"
 				description := "Run observation code on the local system and print out the resulting observations"
-				cli.ShouldHaveArgs(2, usage, description, local_flag_set)
+				cli.ShouldHaveArgs(0, usage, description, local_flag_set)
 				input_file, err := localfile.ChooseFileOrStdin(*local_input_file, *local_use_stdin)
 				if err != nil {
 					cli.HandleCommandError(err, usage, description, local_flag_set)
@@ -61,12 +62,13 @@ func main() {
 			},
 		},
 		{
-			Verb: "observe",
-			Noun: "remote",
+			Verb:     "observe",
+			Noun:     "remote",
+			Supports: []string{"linux", "windows"},
 			ExecutionFn: func() {
 				usage := "lookout observe remote [TARGET] [FLAGS]"
 				description := "Run observation on a target"
-				cli.ShouldHaveArgs(3, usage, description, remote_flag_set)
+				cli.ShouldHaveArgs(1, usage, description, remote_flag_set)
 				input_file, err := localfile.ChooseFileOrStdin(*remote_input_file, *remote_use_stdin)
 				if err != nil {
 					cli.HandleCommandError(err, usage, description, remote_flag_set)
@@ -80,12 +82,13 @@ func main() {
 			},
 		},
 		{
-			Verb: "react",
-			Noun: "local",
+			Verb:     "react",
+			Noun:     "local",
+			Supports: []string{"linux", "windows"},
 			ExecutionFn: func() {
 				usage := "lookout react local [FLAGS]"
 				description := "React to an observation on the local system"
-				cli.ShouldHaveArgs(2, usage, description, local_flag_set)
+				cli.ShouldHaveArgs(0, usage, description, local_flag_set)
 				input_file, err := localfile.ChooseFileOrStdin(*local_input_file, *local_use_stdin)
 				if err != nil {
 					cli.HandleCommandError(err, usage, description, local_flag_set)
@@ -99,12 +102,13 @@ func main() {
 			},
 		},
 		{
-			Verb: "react",
-			Noun: "remote",
+			Verb:     "react",
+			Noun:     "remote",
+			Supports: []string{"linux", "windows"},
 			ExecutionFn: func() {
 				usage := "lookout react remote [TARGET] [FLAGS]"
 				description := "React to an observation on a target"
-				cli.ShouldHaveArgs(3, usage, description, remote_flag_set)
+				cli.ShouldHaveArgs(1, usage, description, remote_flag_set)
 				input_file, err := localfile.ChooseFileOrStdin(*remote_input_file, *remote_use_stdin)
 				if err != nil {
 					cli.HandleCommandError(err, usage, description, remote_flag_set)
@@ -118,12 +122,13 @@ func main() {
 			},
 		},
 		{
-			Verb: "run",
-			Noun: "local",
+			Verb:     "run",
+			Noun:     "local",
+			Supports: []string{"linux", "windows"},
 			ExecutionFn: func() {
 				usage := "lookout run local [ACTION NAME] [FLAGS]"
 				description := "Run an action on the local system"
-				cli.ShouldHaveArgs(3, usage, description, local_flag_set)
+				cli.ShouldHaveArgs(1, usage, description, local_flag_set)
 				input_file, err := localfile.ChooseFileOrStdin(*local_input_file, *local_use_stdin)
 				if err != nil {
 					cli.HandleCommandError(err, usage, description, local_flag_set)
@@ -137,12 +142,13 @@ func main() {
 			},
 		},
 		{
-			Verb: "run",
-			Noun: "remote",
+			Verb:     "run",
+			Noun:     "remote",
+			Supports: []string{"linux", "windows"},
 			ExecutionFn: func() {
 				usage := "lookout run remote [ACTION NAME] [TARGET] [FLAGS]"
 				description := "Run actions on a target"
-				cli.ShouldHaveArgs(4, usage, description, remote_flag_set)
+				cli.ShouldHaveArgs(2, usage, description, remote_flag_set)
 				input_file, err := localfile.ChooseFileOrStdin(*remote_input_file, *remote_use_stdin)
 				if err != nil {
 					cli.HandleCommandError(err, usage, description, remote_flag_set)
@@ -156,12 +162,13 @@ func main() {
 			},
 		},
 		{
-			Verb: "setup",
-			Noun: "remote",
+			Verb:     "setup",
+			Noun:     "remote",
+			Supports: []string{"linux", "windows"},
 			ExecutionFn: func() {
 				usage := "lookout setup remote [TARGET] [FLAGS]"
 				description := "Run actions on a target"
-				cli.ShouldHaveArgs(3, usage, description, setup_flag_set)
+				cli.ShouldHaveArgs(1, usage, description, setup_flag_set)
 				cli.HandleCommandError(
 					remote.CLISetup(*setup_username, os.Args[3], *setup_port),
 					usage,

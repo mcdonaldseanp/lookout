@@ -57,8 +57,9 @@ func readInstanceNames(state string, gcloud_project string) error {
 func main() {
 	command_list := []cli.Command{
 		{
-			Verb: "count",
-			Noun: "instances",
+			Verb:     "count",
+			Noun:     "instances",
+			Supports: []string{"linux", "windows"},
 			ExecutionFn: func() {
 				usage := "gcloud_compute_impl count instances [STATE] [GCLOUD_PROJECT]"
 				description := "count the number of gcloud instances in STATE"
@@ -73,8 +74,9 @@ func main() {
 			},
 		},
 		{
-			Verb: "list",
-			Noun: "instances",
+			Verb:     "list",
+			Noun:     "instances",
+			Supports: []string{"linux", "windows"},
 			ExecutionFn: func() {
 				usage := "gcloud_compute_impl list instances [STATE] [GCLOUD_PROJECT]"
 				description := "return instance names for any instances in STATE"
