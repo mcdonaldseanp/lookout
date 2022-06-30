@@ -1,12 +1,12 @@
 package local
 
 import (
+	"encoding/json"
 	"fmt"
 
 	"github.com/mcdonaldseanp/lookout/localfile"
 	"github.com/mcdonaldseanp/lookout/operation"
 	"github.com/mcdonaldseanp/lookout/operparse"
-	"github.com/mcdonaldseanp/lookout/render"
 )
 
 func runReaction(check_result bool, rctn operation.Reaction, actn_name string, actn *operation.Action, skipped_message string) operation.ReactionResult {
@@ -186,12 +186,11 @@ func React(raw_data []byte) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	final_result, parse_err := render.RenderJson(results)
-	if parse_err != nil {
-		return "", parse_err
+	json_output, json_err := json.Marshal(results)
+	if json_err != nil {
+		return "", fmt.Errorf("could not render result as JSON: %s", json_err)
 	}
-
-	return final_result, nil
+	return string(json_output), nil
 }
 
 func CLIReact(maybe_file string) error {

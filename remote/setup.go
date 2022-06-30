@@ -1,13 +1,13 @@
 package remote
 
 import (
+	"encoding/json"
 	"fmt"
 	"strings"
 
 	"github.com/mcdonaldseanp/clibuild/errtype"
 	"github.com/mcdonaldseanp/clibuild/validator"
 	"github.com/mcdonaldseanp/lookout/connection"
-	"github.com/mcdonaldseanp/lookout/render"
 	"github.com/mcdonaldseanp/lookout/version"
 )
 
@@ -59,10 +59,10 @@ func CLISetup(username string, target string, port string) error {
 	output := make(map[string]interface{})
 	output["ok"] = true
 	output["logs"] = strings.TrimSpace(serr)
-	final_result, json_err := render.RenderJson(output)
+	json_output, json_err := json.Marshal(output)
 	if json_err != nil {
-		return json_err
+		return fmt.Errorf("could not render result as JSON: %s", json_err)
 	}
-	fmt.Printf(final_result)
+	fmt.Print(string(json_output))
 	return nil
 }

@@ -1,6 +1,7 @@
 package local
 
 import (
+	"encoding/json"
 	"fmt"
 
 	"github.com/mcdonaldseanp/clibuild/errtype"
@@ -9,7 +10,6 @@ import (
 	"github.com/mcdonaldseanp/lookout/localfile"
 	"github.com/mcdonaldseanp/lookout/operation"
 	"github.com/mcdonaldseanp/lookout/operparse"
-	"github.com/mcdonaldseanp/lookout/render"
 )
 
 func RunAction(actn operation.Action) operation.ActionResult {
@@ -54,11 +54,11 @@ func Run(raw_data []byte, actn_name string) (string, error) {
 	raw_final_result.Actions[actn_name] = result
 	// The result for actions (for now) is an actionresults set with one action
 	// result in the actions field.
-	final_result, parse_err := render.RenderJson(raw_final_result)
-	if parse_err != nil {
-		return "", parse_err
+	json_output, json_err := json.Marshal(raw_final_result)
+	if json_err != nil {
+		return "", fmt.Errorf("could not render result as JSON: %s", json_err)
 	}
-	return final_result, nil
+	return string(json_output), nil
 }
 
 func CLIRun(maybe_file string, actn_name string) error {

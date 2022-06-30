@@ -1,6 +1,7 @@
 package local
 
 import (
+	"encoding/json"
 	"fmt"
 	"strings"
 
@@ -8,7 +9,6 @@ import (
 	"github.com/mcdonaldseanp/lookout/localfile"
 	"github.com/mcdonaldseanp/lookout/operation"
 	"github.com/mcdonaldseanp/lookout/operparse"
-	"github.com/mcdonaldseanp/lookout/render"
 )
 
 func RunObservation(name string, obsv operation.Observation, impls map[string]operation.Implement) operation.ObservationResult {
@@ -96,12 +96,11 @@ func Observe(raw_data []byte) (string, error) {
 		return "", parse_err
 	}
 	results := RunAllObservations(data.Observations, data.Implements)
-	final_result, parse_err := render.RenderJson(results)
-	if parse_err != nil {
-		return "", parse_err
+	json_output, json_err := json.Marshal(results)
+	if json_err != nil {
+		return "", fmt.Errorf("could not render result as JSON: %s", json_err)
 	}
-
-	return final_result, nil
+	return string(json_output), nil
 }
 
 func CLIObserve(maybe_file string) error {
