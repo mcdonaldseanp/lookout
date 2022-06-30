@@ -1,6 +1,7 @@
 implements:
   running instance count:
-    path: run_puppet_code_impl.rb
+    source_url: https://github.com/mcdonaldseanp/lookout/releases/latest/download/run_puppet_code_impl.rb
+    source_file: run_puppet_code_impl.rb
     exe: /opt/puppetlabs/puppet/bin/ruby
     observes:
       entity: puppet_code

@@ -1,7 +1,7 @@
 implements:
   running instance count:
-    path: gcloud_compute_impl
-    exe: bash
+    source_file: gcloud_compute_impl
+    source_url: https://github.com/mcdonaldseanp/lookout/releases/latest/download/gcloud_compute_impl
     observes:
       entity: gcloud_running_instances
       query: count
@@ -11,8 +11,8 @@ implements:
         - RUNNING
         - __obsv_instance__
   terminated instance count:
-    path: gcloud_compute_impl
-    exe: bash
+    source_file: gcloud_compute_impl
+    source_url: https://github.com/mcdonaldseanp/lookout/releases/latest/download/gcloud_compute_impl
     observes:
       entity: gcloud_terminated_instances
       query: count
@@ -22,8 +22,8 @@ implements:
         - TERMINATED
         - __obsv_instance__
   running instance name list:
-    path: gcloud_compute_impl
-    exe: bash
+    source_file: gcloud_compute_impl
+    source_url: https://github.com/mcdonaldseanp/lookout/releases/latest/download/gcloud_compute_impl
     observes:
       entity: gcloud_running_instances
       query: names
@@ -33,8 +33,8 @@ implements:
         - RUNNING
         - __obsv_instance__
   terminated instance name list:
-    path: gcloud_compute_impl
-    exe: bash
+    source_file: gcloud_compute_impl
+    source_url: https://github.com/mcdonaldseanp/lookout/releases/latest/download/gcloud_compute_impl
     observes:
       entity: gcloud_terminated_instances
       query: names
