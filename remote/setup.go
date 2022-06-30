@@ -7,7 +7,7 @@ import (
 
 	"github.com/mcdonaldseanp/clibuild/errtype"
 	"github.com/mcdonaldseanp/clibuild/validator"
-	"github.com/mcdonaldseanp/lookout/connection"
+	"github.com/mcdonaldseanp/lookout/remoteexec"
 	"github.com/mcdonaldseanp/lookout/version"
 )
 
@@ -34,7 +34,7 @@ func Setup(username string, target string, port string) (string, string, error) 
 		chmod 755 $HOME/.lookout/bin/lookout 1>&2`,
 		version.ReleaseArtifact("lookout"),
 	)
-	sout, serr, ec, err := connection.RunSSHCommand(command, "", username, target, port)
+	sout, serr, ec, err := remoteexec.RunSSHCommand(command, "", username, target, port)
 	if err != nil {
 		origin := err
 		if errtype_origin, ok := origin.(*errtype.RemoteShellError); ok {

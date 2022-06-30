@@ -1,4 +1,4 @@
-package localfile
+package localdata
 
 import (
 	"bufio"

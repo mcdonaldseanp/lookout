@@ -7,7 +7,7 @@ import (
 	"os/exec"
 
 	"github.com/mcdonaldseanp/clibuild/errtype"
-	"github.com/mcdonaldseanp/lookout/localfile"
+	"github.com/mcdonaldseanp/lookout/localdata"
 	"github.com/mcdonaldseanp/lookout/sanitize"
 )
 
@@ -36,7 +36,7 @@ func ExecScriptReadOutput(executable string, script string, args []string) (stri
 	}
 	filename := f.Name()
 	defer os.Remove(filename) // clean up
-	localfile.OverwriteFile(filename, []byte(script))
+	localdata.OverwriteFile(filename, []byte(script))
 	final_args := append([]string{filename}, args...)
 	return ExecReadOutput(executable, final_args)
 }

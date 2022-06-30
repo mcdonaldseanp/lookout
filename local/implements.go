@@ -3,7 +3,7 @@ package local
 import (
 	"os"
 
-	"github.com/mcdonaldseanp/lookout/localfile"
+	"github.com/mcdonaldseanp/lookout/localdata"
 	"github.com/mcdonaldseanp/lookout/operation"
 	"github.com/mcdonaldseanp/lookout/remotedata"
 )
@@ -20,5 +20,5 @@ func DownloadImplement(impl *operation.Implement) (string, error) {
 	}
 
 	file_loc := os.Getenv("HOME") + "/" + IMPLS_LOC + "/" + impl.Source_File
-	return file_loc, localfile.OverwriteFile(file_loc, raw_data)
+	return file_loc, localdata.OverwriteFile(file_loc, raw_data)
 }

@@ -5,8 +5,8 @@ import (
 
 	"github.com/mcdonaldseanp/clibuild/errtype"
 	"github.com/mcdonaldseanp/clibuild/validator"
-	"github.com/mcdonaldseanp/lookout/connection"
-	"github.com/mcdonaldseanp/lookout/localfile"
+	"github.com/mcdonaldseanp/lookout/localdata"
+	"github.com/mcdonaldseanp/lookout/remoteexec"
 )
 
 func Observe(raw_data []byte, username string, target string, port string) (string, error) {
@@ -23,7 +23,7 @@ func Observe(raw_data []byte, username string, target string, port string) (stri
 	if err != nil {
 		return "", err
 	}
-	sout, serr, ec, err := connection.RunSSHCommand("$HOME/.lookout/bin/lookout observe local --stdin", string(raw_data), username, target, port)
+	sout, serr, ec, err := remoteexec.RunSSHCommand("$HOME/.lookout/bin/lookout observe local --stdin", string(raw_data), username, target, port)
 	if err != nil {
 		origin := err
 		if errtype_origin, ok := origin.(*errtype.RemoteShellError); ok {
@@ -41,7 +41,7 @@ func Observe(raw_data []byte, username string, target string, port string) (stri
 }
 
 func CLIObserve(maybe_file string, username string, target string, port string) error {
-	raw_data, err := localfile.ReadFileOrStdin(maybe_file)
+	raw_data, err := localdata.ReadFileOrStdin(maybe_file)
 	if err != nil {
 		return err
 	}

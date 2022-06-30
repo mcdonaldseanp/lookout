@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 
-	"github.com/mcdonaldseanp/lookout/localfile"
+	"github.com/mcdonaldseanp/lookout/localdata"
 	"github.com/mcdonaldseanp/lookout/operation"
 	"github.com/mcdonaldseanp/lookout/operparse"
 )
@@ -195,7 +195,7 @@ func React(raw_data []byte) (string, error) {
 
 func CLIReact(maybe_file string) error {
 	// ReadFileOrStdin performs validation on maybe_file
-	raw_data, err := localfile.ReadFileOrStdin(maybe_file)
+	raw_data, err := localdata.ReadFileOrStdin(maybe_file)
 	if err != nil {
 		return err
 	}

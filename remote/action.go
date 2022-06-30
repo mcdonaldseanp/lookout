@@ -5,8 +5,8 @@ import (
 
 	"github.com/mcdonaldseanp/clibuild/errtype"
 	"github.com/mcdonaldseanp/clibuild/validator"
-	"github.com/mcdonaldseanp/lookout/connection"
-	"github.com/mcdonaldseanp/lookout/localfile"
+	"github.com/mcdonaldseanp/lookout/localdata"
+	"github.com/mcdonaldseanp/lookout/remoteexec"
 )
 
 func Run(raw_data []byte, actn_name string, username string, target string, port string) (string, error) {
@@ -26,7 +26,7 @@ func Run(raw_data []byte, actn_name string, username string, target string, port
 		return "", err
 	}
 	command := fmt.Sprintf("$HOME/.lookout/bin/lookout run local \"%s\" --stdin", actn_name)
-	sout, serr, ec, err := connection.RunSSHCommand(command, string(raw_data), username, target, port)
+	sout, serr, ec, err := remoteexec.RunSSHCommand(command, string(raw_data), username, target, port)
 	if err != nil {
 		origin := err
 		if errtype_origin, ok := origin.(*errtype.RemoteShellError); ok {
@@ -44,7 +44,7 @@ func Run(raw_data []byte, actn_name string, username string, target string, port
 }
 
 func CLIRun(maybe_file string, actn_name string, username string, target string, port string) error {
-	raw_data, err := localfile.ReadFileOrStdin(maybe_file)
+	raw_data, err := localdata.ReadFileOrStdin(maybe_file)
 	if err != nil {
 		return err
 	}
