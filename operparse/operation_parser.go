@@ -44,9 +44,10 @@ func ConcatOperations(first *operation.Operations, second *operation.Operations)
 		first.Implements = make(map[string]operation.Implement)
 	}
 	for obsv_name, obsv := range second.Observations {
-		if obsv.Empty() {
+		obs_err := obsv.Empty()
+		if obs_err != nil {
 			return &errtype.InvalidInput{
-				Message: fmt.Sprintf("Observation '%s' is empty, observations must have all of 'entity', 'query', and 'instance' set", obsv_name),
+				Message: fmt.Sprintf("Observation '%s' is invalid: %s", obsv_name, obs_err),
 				Origin:  nil,
 			}
 		}
@@ -72,9 +73,10 @@ func ConcatOperations(first *operation.Operations, second *operation.Operations)
 		first.Observations[obsv_name] = obsv
 	}
 	for rctn_name, rctn := range second.Reactions {
-		if rctn.Empty() {
+		rctn_err := rctn.Empty()
+		if rctn_err != nil {
 			return &errtype.InvalidInput{
-				Message: fmt.Sprintf("Reaction '%s' is empty, reactions must have all of 'observation', 'action', and 'condition check/value' set", rctn_name),
+				Message: fmt.Sprintf("Reaction '%s' is invalid: %s", rctn_name, rctn_err),
 				Origin:  nil,
 			}
 		}
@@ -91,9 +93,10 @@ func ConcatOperations(first *operation.Operations, second *operation.Operations)
 		first.Reactions[rctn_name] = rctn
 	}
 	for actn_name, actn := range second.Actions {
-		if actn.Empty() {
+		actn_err := actn.Empty()
+		if actn_err != nil {
 			return &errtype.InvalidInput{
-				Message: fmt.Sprintf("Action '%s' is empty, actions must have 'exe' and one of 'path' or 'script' set", actn_name),
+				Message: fmt.Sprintf("Action '%s' is invalid: %s", actn_name, actn_err),
 				Origin:  nil,
 			}
 		}
@@ -110,9 +113,10 @@ func ConcatOperations(first *operation.Operations, second *operation.Operations)
 		first.Actions[actn_name] = actn
 	}
 	for impl_name, impl := range second.Implements {
-		if impl.Empty() {
+		impl_err := impl.Empty()
+		if impl_err != nil {
 			return &errtype.InvalidInput{
-				Message: fmt.Sprintf("Implement '%s' is empty, implements must have 'exe' set, one of 'path' or 'script' set, and either react or observe or both", impl_name),
+				Message: fmt.Sprintf("Implement '%s' is invalid, %s", impl_name, impl_err),
 				Origin:  nil,
 			}
 		}

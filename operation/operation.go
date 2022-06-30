@@ -1,6 +1,7 @@
 package operation
 
 import (
+	"fmt"
 	"sort"
 	"strings"
 
@@ -16,7 +17,7 @@ type Operation interface {
 	// Some operations have multiple hash keys, because
 	// they can conflict in multiple ways
 	HashKeys() []string
-	Empty() bool
+	Empty() error
 }
 
 // OAR definitions
@@ -71,13 +72,15 @@ func (obsv Observation) HashKeys() []string {
 	return result
 }
 
-func (obsv Observation) Empty() bool {
-	if obsv.Entity == "" ||
-		obsv.Query == "" ||
-		obsv.Instance == "" {
-		return true
+func (obsv Observation) Empty() error {
+	if obsv.Entity == "" {
+		return fmt.Errorf("missing entity")
+	} else if obsv.Query == "" {
+		return fmt.Errorf("missing query")
+	} else if obsv.Instance == "" {
+		return fmt.Errorf("missing instance")
 	}
-	return false
+	return nil
 }
 
 // ---------------------------------------------------------------
@@ -107,8 +110,11 @@ func (actn Action) HashKeys() []string {
 	return []string{}
 }
 
-func (actn Action) Empty() bool {
-	return actn.Exe == ""
+func (actn Action) Empty() error {
+	if actn.Exe == "" {
+		return fmt.Errorf("missing exe")
+	}
+	return nil
 }
 
 // ---------------------------------------------------------------
@@ -151,14 +157,17 @@ func (rctn Reaction) HashKeys() []string {
 	return []string{}
 }
 
-func (rctn Reaction) Empty() bool {
-	if rctn.Observation == "" ||
-		rctn.Action == "" ||
-		rctn.Condition.Check == "" ||
-		rctn.Condition.Value == "" {
-		return true
+func (rctn Reaction) Empty() error {
+	if rctn.Observation == "" {
+		return fmt.Errorf("missing observation")
+	} else if rctn.Action == "" {
+		return fmt.Errorf("missing action")
+	} else if rctn.Condition.Check == "" {
+		return fmt.Errorf("missing condition check")
+	} else if rctn.Condition.Value == "" {
+		return fmt.Errorf("missing condition value")
 	}
-	return false
+	return nil
 }
 
 // ---------------------------------------------------------------
@@ -257,27 +266,27 @@ func (impl Implement) HashKeys() []string {
 	return result
 }
 
-func (impl Implement) Empty() bool {
-	// Exe can _only_ be empty if Source_File is provided, since
-	// the source file will substitute for the missing exe
-	if len(impl.Exe) < 1 && len(impl.Source_File) < 1 {
-		return true
-	}
+func (impl Implement) Empty() error {
 	// impls must have one of:
 	// * A complete source, including file and url
 	// * A path
 	// * A script
 	if (len(impl.Source_File) < 1 && len(impl.Source_Url) < 1) && len(impl.Path) < 1 && len(impl.Script) < 1 {
-		return true
+		return fmt.Errorf("missing at least one of: path, script, source_file/url")
+	}
+	// Exe can _only_ be empty if Source_File is provided, since
+	// the source file will substitute for the missing exe
+	if len(impl.Exe) < 1 && len(impl.Source_File) < 1 {
+		return fmt.Errorf("exe can only be empty with valid source_file/url")
 	}
 	// I'm not positive this is true, but can't think
 	// of whether or not an implement can omit
 	// both reacting and observing (I'm pretty
 	// sure they are useless without that)
 	if emptyReacts(impl) && emptyObserves(impl) {
-		return true
+		return fmt.Errorf("missing at least one of reacts, observes")
 	}
-	return false
+	return nil
 }
 
 // ---------------------------------------------------------------
